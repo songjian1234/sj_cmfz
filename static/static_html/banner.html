@@ -2,28 +2,37 @@
     $(function () {
         $("#bannerTable").jqGrid({
             url: "/banner/get_all_banner/",
-            datatype: 'json',
-            styleUI: "Bootstrap",
+            datatype: "json",
             autowidth: true,
-            pager: "#bannerPagerNew",
-            rowNum: 2,
-            rowList: [2, 5, 10],
+            pager: "bannerPagerNew",
             viewrecords: true,
-            colNames: ["ID", "描述", "上传时间", "是否显示", "图片", "操作"],
+            rownumbers: true,
+            editurl: "/banner/data_oper/",
+            cellEdit: true,
+            height: 500,
+            rowNum: 3,
+            rowList: [3, 6, 10],
+            styleUI: "Bootstrap",
+            colNames: ["ID", "描述", "是否显示", "图片", "操作"],
             colModel: [
-                {name: "id"},
-                {name: "desc"},
-                {name: "date"},
-                {name: "status"},
+                {name: "id", align: 'center'},
+                {name: "describe", align: 'center', editable: true},
+                {name: "show", align: 'center', editable: true, edittype: 'select', editoptions: {value: "1:展示;2:不展示"}},
                 {       // 获取图片保存在数据库的路径
-                    name: "pic", formatter: function (cellvalue, options, rowObject) {
-                        return "<img style='height:20px;width: 20px' src='/static/+'>"
+                    name: "url", fixed: true, formatter: function (cellvalue, options, rowObject) {
+                        console.log(cellvalue);
+                        return '<img src=' + '/static/img/' + cellvalue + " style=\"width:300px;height:100px;\"" + ' >'
                     }
                 },
-                {},
+                {
+                    name: "option", align: 'center', formatter: function (cellvalue, options, rowObject) {
+                        return '<button class="btn btn-warning" onclick="change(' + rowObject.id + ')">修改</button>' +
+                            '<button class="btn btn-info" onclick="del(' + rowObject.id + ')">删除</button>'
+                    }
+                },
             ],
 
-        });
+        }).jqGrid('navGrid', '#bannerPagerNew', {edit: true});
 
 
         // 点击模态框的保存按钮 向后台提交当前的表单信息 保存轮播图
@@ -54,7 +63,32 @@
             });
         });
 
+        $('#sData').click(function () {
+            alert("修改成功")
+            $('#edithdbannerTable').modal('hide')
+        })
+
     });
+
+    //修改按钮
+    function change(ele) {
+        console.log(ele);
+        jQuery("#bannerTable").jqGrid('editGridRow', ele, {
+            height: 300,
+            reloadAfterSubmit: true
+        });
+
+    }
+
+    //删除按钮
+    function del(ele) {
+        jQuery("#bannerTable").jqGrid('delGridRow', ele, {
+            reloadAfterSubmit: true
+        });
+
+    }
+
+
 </script>
 
 
@@ -78,11 +112,13 @@
     <button class="btn btn-primary" data-aa="@456" data-whatever="@123" id="btn" data-toggle="modal"
             data-target="#bannerModal">添加
     </button>
+    <!--
     <button class="btn btn-warning" id="edit"><span class="glyphicon glyphicon-edit"></span> 修改</button>
-    <button class="btn btn-danger" id="del">删除</button>
+    <button class="btn btn-danger" id="del">删除</button>-->
 </div>
 
 <body>
+{#添加模态框#}
 <div class="modal fade" id="bannerModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content" style="width:750px">
@@ -110,8 +146,10 @@
                         <div class="form-group ">
                             <label class="col-sm-2 control-label">状态：</label>
                             <div class="col-sm-10">
-                                <input type="text" name="status" id="upload_status" class="form-control"
-                                       placeholder="请选择文件状态">
+                                <select name="status" id="upload_status">
+                                    <option value="1">展示</option>
+                                    <option value="2">不展示</option>
+                                </select>
                             </div>
                         </div>
                         <div class="form-group ">
@@ -132,5 +170,6 @@
         </div>
     </div>
 </div>
+
 </body>
 

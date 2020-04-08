@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'shouye',
+    'banner',
 ]
 
 MIDDLEWARE = [
@@ -77,8 +78,12 @@ WSGI_APPLICATION = 'sj_cmfz.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'sj',                           # 数据库名
+        'USER': 'root',						    # 用户名
+        'PASSWORD': '123456',					# 密码
+        'HOST':'localhost',						# 主机ip
+        'PORT':3306,
     }
 }
 
