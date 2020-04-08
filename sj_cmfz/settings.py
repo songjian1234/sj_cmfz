@@ -122,3 +122,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+
+API_KEY = "1b1918b59521f9ec9fcbb102f304d60c"
