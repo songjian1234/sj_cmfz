@@ -135,3 +135,20 @@ def get_data(request):
     data = {"x":x,"y":y}
     print(data)
     return JsonResponse(data)
+
+
+def get_map(request):
+    se = []
+    a = TUser.objects.all()
+    b = a.values('address')
+    for i in b:
+        se.append(i['address'])
+    se = list(set(se))
+    print(se)
+    data = []
+    for i in se:
+        con =  TUser.objects.filter(address=i).count()
+        c = {"name":i[:-1],"value":con}
+        data.append(c)
+    print(data)
+    return JsonResponse(data,safe=False)
