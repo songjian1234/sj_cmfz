@@ -86,7 +86,7 @@ class TLessons(models.Model):
 
 class TPhoto(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    url = models.CharField(max_length=200, blank=True, null=True)
+    url = models.ImageField(upload_to="img")
     describe_1 = models.CharField(max_length=200, blank=True, null=True)
     show_1 = models.CharField(max_length=200, blank=True, null=True)
 

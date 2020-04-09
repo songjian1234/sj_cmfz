@@ -10,6 +10,13 @@ from django.views.decorators.csrf import csrf_exempt
 from shouye.models import TPhoto
 
 
+import uuid,os
+def generateUUID(filename):    # 创建唯一的文件名
+    id = str(uuid.uuid4())
+    extend = os.path.splitext(filename)[1]
+    return id+extend
+
+
 def get_all_banner(request):
     """
     获取所有轮播图的相关信息并转换成json响应的前端
@@ -38,7 +45,7 @@ def get_all_banner(request):
     def myDefault(u):
         if isinstance(u, TPhoto):
             return {"id": u.pk,
-                    "url": u.url,
+                    "url": str(u.url),
                     "describe": u.describe_1,
                     "show": u.show_1,}
     data = json.dumps(page_data, default=myDefault)
@@ -52,6 +59,7 @@ def add_banner(request):
     title = request.POST.get("title")
     status = request.POST.get('status')
     pic = request.FILES.get('pic')
+    # pic.name = generateUUID(pic.name)
     print(title, status, pic)
     TPhoto.objects.create(url=pic, show_1=status, describe_1=title,)
     return HttpResponse('ok')
