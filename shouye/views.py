@@ -1,9 +1,14 @@
+import datetime
+
 from django.http import HttpResponse
 from django.shortcuts import render
 
 # Create your views here.
 
 import redis
+
+from shouye.models import TUser
+
 redis = redis.Redis(host='127.0.0.1', port=6379)
 
 from django.views.decorators.csrf import csrf_exempt
@@ -13,8 +18,51 @@ from utils.random_code import Yanzheng
 from utils.send_mess import YunPian
 from utils.shoujigeshi import Shouji
 
+def day_get(d): # 通过for 循环得到天数，如果想得到两周的时间，只需要把8改成15就可以了。
+    for i in range(1, 8):
+        oneday = datetime.timedelta(days=i)
+        day = d - oneday
+        date_to = datetime.datetime(day.year, day.month, day.day)
+        yield str(date_to)[:10]
+
 
 def shouye(request):
+    d = datetime.datetime.now()
+    qq = day_get(d)
+    list = []
+    for obj in qq:
+        list.append(obj)
+    list_week_day = list[::-1]
+    num = 0
+    x = []
+    y = []
+    for i in range(7):
+        x.append(list_week_day[i])
+        print(list_week_day[i])
+        count = TUser.objects.all()
+        for shi in count:
+            if shi.spare.strftime('%Y-%m-%d') == list_week_day[i]:
+                num += 1
+        y.append(num)
+        print(num)
+    data = {"x": x, "y": y}
+
+    print(type(data),data)
+    redis.set('qitian',str(data))
+
+    se = []
+    a = TUser.objects.all()
+    b = a.values('address')
+    for i in b:
+        se.append(i['address'])
+    se = set(se)
+    print(se)
+    dat = []
+    for i in se:
+        con = TUser.objects.filter(address=i).count()
+        c = {"name": i[:-1], "value": con}
+        dat.append(c)
+    redis.set('quanguo', str(dat))
     return render(request,'shouye.html')
 
 

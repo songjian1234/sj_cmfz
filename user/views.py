@@ -1,4 +1,6 @@
 import json
+import redis
+redis = redis.Redis(host='127.0.0.1', port=6379)
 
 from django.core.paginator import Paginator
 from django.http import HttpResponse, JsonResponse
@@ -100,7 +102,7 @@ def data_oper(request):
 
 
 
-d = datetime.datetime.now()
+
 
 
 def day_get(d): # 通过for 循环得到天数，如果想得到两周的时间，只需要把8改成15就可以了。
@@ -111,44 +113,14 @@ def day_get(d): # 通过for 循环得到天数，如果想得到两周的时间�
         yield str(date_to)[:10]
 
 
-
-
 def get_data(request):
-    qq = day_get(d)
-
-    list = []
-    for obj in qq:
-        list.append(obj)
-    list_week_day = list[::-1]
-    num = 0
-    x=[]
-    y=[]
-    for i in range(7):
-        x.append(list_week_day[i])
-        print(list_week_day[i])
-        count= TUser.objects.all()
-        for shi in count:
-            if shi.spare.strftime('%Y-%m-%d')==list_week_day[i]:
-                num+=1
-        y.append(num)
-        print(num)
-    data = {"x":x,"y":y}
+    data = redis.get('qitian')
+    data = str(data)[2:-1]
     print(data)
-    return JsonResponse(data)
+    return JsonResponse(eval(data))
 
 
 def get_map(request):
-    se = []
-    a = TUser.objects.all()
-    b = a.values('address')
-    for i in b:
-        se.append(i['address'])
-    se = list(set(se))
-    print(se)
-    data = []
-    for i in se:
-        con =  TUser.objects.filter(address=i).count()
-        c = {"name":i[:-1],"value":con}
-        data.append(c)
+    data = redis.get('quanguo')
     print(data)
-    return JsonResponse(data,safe=False)
+    return JsonResponse(eval(data),safe=False)
