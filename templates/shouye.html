@@ -14,6 +14,8 @@
     <script src="{% static 'boot/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'jqgrid/js/trirand/src/jquery.jqGrid.js' %}"></script>
     <script src="{% static 'jqgrid/js/trirand/i18n/grid.locale-cn.js' %}"></script>
+    <script src="{% static 'echarts/echarts.min.js' %}"></script>
+    <script src="{% static 'echarts/echarts.js' %}"></script>
 </head>
 <body>
 {#导航条#}
@@ -52,16 +54,16 @@
                                     用户管理
                                 </a>
                             </li>
-{#                            <li>#}
-{#                                <a href="Javascript:$('#centerLayout').load('{% static "static_html/user.html" %}')">#}
-{#                                    用户注册统计图#}
-{#                                </a>#}
-{#                            </li>#}
-{#                            <li>#}
-{#                                <a href="Javascript:$('#centerLayout').load('{% static "static_html/user.html" %}')">#}
-{#                                    用户全国分布图#}
-{#                                </a>#}
-{#                            </li>#}
+                            <li>
+                                <a href="Javascript:$('#centerLayout').load('{% static "static_html/echarts.html" %}')">
+                                    用户注册统计图
+                                </a>
+                            </li>
+                            <li>
+                                <a href="Javascript:$('#centerLayout').load('{% static "static_html/quanguo.html" %}')">
+                                    用户全国分布图
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>

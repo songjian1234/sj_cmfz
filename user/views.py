@@ -1,14 +1,18 @@
 import json
 
 from django.core.paginator import Paginator
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 
 
 # Create your views here.
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from shouye.models import TUser
+import datetime
+
+
 
 
 import uuid,os
@@ -92,3 +96,42 @@ def data_oper(request):
         id = request.POST.get('id')
         TUser.objects.get(pk=id).delete()
     return HttpResponse('ok')
+
+
+
+
+d = datetime.datetime.now()
+
+
+def day_get(d): # 通过for 循环得到天数，如果想得到两周的时间，只需要把8改成15就可以了。
+    for i in range(1, 8):
+        oneday = datetime.timedelta(days=i)
+        day = d - oneday
+        date_to = datetime.datetime(day.year, day.month, day.day)
+        yield str(date_to)[:10]
+
+
+
+
+def get_data(request):
+    qq = day_get(d)
+
+    list = []
+    for obj in qq:
+        list.append(obj)
+    list_week_day = list[::-1]
+    num = 0
+    x=[]
+    y=[]
+    for i in range(7):
+        x.append(list_week_day[i])
+        print(list_week_day[i])
+        count= TUser.objects.all()
+        for shi in count:
+            if shi.spare.strftime('%Y-%m-%d')==list_week_day[i]:
+                num+=1
+        y.append(num)
+        print(num)
+    data = {"x":x,"y":y}
+    print(data)
+    return JsonResponse(data)
