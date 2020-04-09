@@ -59,7 +59,7 @@ def add_banner(request):
     title = request.POST.get("title")
     status = request.POST.get('status')
     pic = request.FILES.get('pic')
-    # pic.name = generateUUID(pic.name)
+    pic.name = generateUUID(pic.name)
     print(title, status, pic)
     TPhoto.objects.create(url=pic, show_1=status, describe_1=title,)
     return HttpResponse('ok')
