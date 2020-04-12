@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="{% static 'kindeditor/kindeditor-all-min.js' %}"></script>
+    <script src="{% static 'kindeditor/lang/zh-CN.js' %}"></script>
+    <script>
+        KindEditor.ready(function (K) {
+            K.create('#editor_id', {
+                width: "800px",     // 指定编辑器的高度与高度  优先级高于textarea
+                height: "400px",
+                // items:           // 指定编辑器的工具栏
+                resizeType: 2,      // 指定工具栏是否可以改变高度宽度
+                uploadJson: "/article/upload/",     // 指定上传文件时所使用的url地址
+                allowFileManager: true,     // 显示图片空间的按钮
+                fileManagerJson: "/article/get_all_img/",        // 指定浏览远程图片的服务器端程序。
+            });
+        });
+    </script>
+</head>
+<body>
+
+<textarea id="editor_id" name="content" style="width:700px;height:300px;">
+
+</textarea>
+
+</body>
+</html>
