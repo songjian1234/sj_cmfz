@@ -1,0 +1,366 @@
+<script>
+    var aaa = 0
+    var eee
+    $(function () {
+        $("#albumTable").jqGrid({
+            url: "/album/getAllAlbum/",
+            editurl: "/album/editAlbum/",
+            styleUI: "Bootstrap",
+            datatype: "JSON",
+            autowidth: true,
+            height: 500,
+            viewrecords: true,
+            pager: "#albumPager",
+            rowNum: 2,
+            rowList: [5, 10, 15],
+            rownumbers: true,
+            multiselect: true,
+            subGrid: true,     // 开启二级表格的使用
+            subGridRowExpanded: function (subGridId, albumId) {
+                addSubGrid(subGridId, albumId);
+                aaa = albumId
+            },
+            colNames: ["编号", "标题", "分数", "作者", "播音员", "章节数", "专辑简介", "上传时间", "插图"],
+            colModel: [
+                {name: "id",},
+                {
+                    name: "name", editable: true,
+                    editrules: {required: true}
+                },
+                {
+                    name: "score", editable: true,
+                    editrules: {required: true, number: true, minValue: 1, maxValue: 10}
+                },
+                {
+                    name: "author", editable: true,
+                    editrules: {required: true}
+                },
+                {
+                    name: "announcer", editable: true,
+                    editrules: {required: true}
+                },
+                {
+                    name: "num", editable: true,
+                    editrules: {required: true, number: true, minValue: 1}
+                },
+                {
+                    name: "content", editable: true,
+                    editrules: {required: true}
+                },
+
+
+                {
+                    name: "date",  edittype: "date",
+                    editrules: {required: true}
+                },
+                {
+                    name: "url",  edittype: "file",
+                    editoptions: {
+                        enctype: "multipart/form-data"
+                    },
+                    formatter: function (cellvalue, options, rowObject) {
+                        return "<img style='height: 80px;width: 180px' src='/static/" + cellvalue + " '/>"
+                    }
+                }
+            ],
+
+        }).jqGrid("navGrid", "#albumPager", {
+                add: true, edit: true, del: true, search: true, refresh: true, edittext: "编辑", addtext: "添加", deltext: "删除"
+            },
+        )
+
+
+    });
+
+    //添加数据的模态框
+    function addalbum() {
+        $("#albumadd").modal('show');
+    }
+
+    //保存添加的数据
+    function add_album_1() {
+        // 通过formdata获取文件的值
+        var album_title = $("#album_title").val();
+        var album_name = $("#album_name").val();
+        var album_score = $("#album_score").val();
+        var album_author = $("#album_author").val();
+        var album_announcer = $("#album_announcer").val();
+        var album_num = $("#album_num").val();
+        var album_content = $("#album_content").val();
+        var pic = $("#album_pic")[0].files[0];
+
+        var formData = new FormData();
+        formData.append("album_title", album_title);
+        formData.append("album_name", album_name);
+        formData.append("album_score", album_score);
+        formData.append("album_author", album_author);
+        formData.append("album_announcer", album_announcer);
+        formData.append("album_content", album_content);
+        formData.append("album_num", album_num);
+        formData.append("pic", pic);
+
+        $.ajax({
+            url: "/album/add_album/",
+            type: "post",
+            data: formData,
+            processData: false,     // 使数据不做处理
+            contentType: false,     // 不设置请求头
+            success: function () {
+                // 根据保存的返回值进行处理
+                $('#albumadd').modal('hide');
+                // 刷新jqgrid表格
+                $('#albumTable').trigger("reloadGrid");
+            }
+        });
+    }
+
+
+    // 完成二级表格的方法
+    function addSubGrid(subGridId, albumId) {
+        // 为二级表格的table 以及 div动态生成id
+        subGridTableId = subGridId + "table";
+        eee = subGridTableId
+        subGridPageId = subGridId + "pager";
+        // 根据动态生成的id 指定html容器
+        $("#" + subGridId).html(
+            "<table id='" + subGridTableId + "'></table><div id='" + subGridPageId + "'></div>"
+        );
+        // 根据准备好的容器去生成表格
+        $("#" + subGridTableId).jqGrid({
+            url: "/album/getChapterByAlbumId/?albumId=" + albumId,
+            editurl: "/album/editAlbum_1/",
+            datatype: 'json',
+            styleUI: "Bootstrap",
+            autowidth: true,
+            pager: "#" + subGridPageId,
+            caption: "章节管理",
+            rowNum: 2,
+            rowList: [2, 5, 10],
+            viewrecords: true,
+            toolbar: [true, 'top'],
+            colNames: ["ID", "章节名", "大小", "时长", "章节url", "操作"],
+            colModel: [
+                {name: "id"},
+                {name: "name", editable: true},
+                {name: "size"},
+                {name: "duration"},
+                {name: "url"},
+                {
+                    name: "option", formatter: function (cellvalue, options, rowObject) {
+                        return "<a href=\"javascript:void(0)\" class=\"btn btn-primary\" onclick=\"playAudio('" + rowObject.url + "')\"><span class=\"glyphicon glyphicon-play\"></span> 播放</a>"+
+                                '<button class="btn btn-warning" onclick="edit_album(' + rowObject.id + ')">修改</button>' +
+                            '<button class="btn btn-info" onclick="del_album(' + rowObject.id + ')">删除</button>'
+                    }
+                },
+            ]
+        });
+        // 在工具栏中添加按钮
+        $('#t_' + subGridTableId).append('<button class="btn btn-primary" onclick="add_album_2('+subGridTableId+')">添加章节</button>')
+    }
+
+    // 展示添加章节的模态框
+    function add_album_2() {
+        $("#albumModal").modal('show');
+    }
+
+    //修改
+    function edit_album(ele) {
+        console.log(ele);
+        jQuery("#"+eee).jqGrid('editGridRow', ele, {
+            height: 300,
+            reloadAfterSubmit: true
+        });
+
+    }
+
+    //删除按钮
+    function del_album(ele) {
+        jQuery("#"+eee).jqGrid('delGridRow', ele, {
+            reloadAfterSubmit: true
+        });
+
+    }
+
+    //保存添加章节的数据
+    function addd_album() {
+        // 通过formdata获取文件的值
+        var yinpin_title = $("#yinpin_title").val();
+        var url = $("#yinpin_url")[0].files[0];
+
+        var formData = new FormData();
+        formData.append("yinpin_title", yinpin_title);
+        formData.append("idd", aaa);
+        formData.append("url", url);
+
+        $.ajax({
+            url: "/album/add_chapter/",
+            type: "post",
+            data: formData,
+            processData: false,     // 使数据不做处理
+            contentType: false,     // 不设置请求头
+            success: function () {
+                // 根据保存的返回值进行处理
+                $('#albumModal').modal('hide');
+                // 刷新jqgrid表格
+                $('#'+eee).trigger("reloadGrid");
+
+            }
+        });
+    }
+
+    // 播放音频  需要传入当前播放音频的url
+    function playAudio(url) {
+        console.log(url);
+        // 展示播放框
+        $("#playAudioDiv").modal('show');
+        $('#playAudioId').attr("src", "/static/"+url);
+    }
+
+</script>
+<div class="page-header">
+    <h2>专辑与章节管理</h2>
+</div>
+<ul class="nav nav-tabs">
+    <li class="active" style="font-weight: bold"><a>专辑与章节信息</a></li>
+    <li>
+        <a  style="font-weight: bold" onclick="addalbum()"> 添加专辑</a>
+    </li>
+</ul>
+<div id="playAudioDiv" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <!--使用htmlaudio完成播放-->
+        <audio id="playAudioId" src="" controls></audio>
+    </div>
+</div>
+<div class="panel panel-default">
+    <table id="albumTable"></table>
+    <div id="albumPager" style="width: auto;height: 50px"></div>
+    <button class="btn btn-info" data-aa="@456" data-whatever="@123" id="edit_album" data-toggle="modal"
+            data-target="#myModal">
+        编辑
+    </button>
+    <button class="btn btn-warning" data-aa="@456" data-whatever="@123" id="del_album" data-toggle="modal"
+            data-target="#myModal">
+        删除
+    </button>
+</div>
+
+<div class="modal fade" id="albumModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="width:750px">
+            <!--模态框标题-->
+            <div class="modal-header">
+                <!--
+                    用来关闭模态框的属性:data-dismiss="modal"
+                -->
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                <h4 class="modal-title">编辑用户信息</h4>
+            </div>
+
+            <!--模态框内容体-->
+            <div class="modal-body">
+                <!--模态框内容体-->
+                <form action="" id="albumForm">
+                    <div class="modal-body form-horizontal">
+                        <div class="form-group ">
+                            <label class="col-sm-2 control-label">章节名：</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="yinpin_title" id="yinpin_title" class="form-control"
+                                       placeholder="请输入章节名">
+                            </div>
+                        </div>
+
+                        <div class="form-group ">
+                            <label class="col-sm-2 control-label">音频：</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="yinpin_url" id="yinpin_url" class="form-control" >
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+            <!--模态页脚-->
+            <div class="modal-footer" id="modal_footer">
+                <button type="button" class="btn btn-primary" id="save_001" onclick="addd_album()">保存</button>
+                <button type="button" class="btn btn-warning" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="albumadd" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="width:750px">
+            <!--模态框标题-->
+            <div class="modal-header">
+                <!--
+                    用来关闭模态框的属性:data-dismiss="modal"
+                -->
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                <h4 class="modal-title">编辑用户信息</h4>
+            </div>
+
+            <!--模态框内容体-->
+            <div class="modal-body">
+                <form action="//" class="form-horizontal" id="addalbum">
+                    <div class="form-group">
+                        <label class="col-sm-1 control-label">标题</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="album_title" id="album_title" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-1 control-label">姓名</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="album_name" id="album_name" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-1 control-label">分数</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="album_score" id="album_score" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-1 control-label">作者</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="album_author" id="album_author" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-1 control-label">播音员</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="album_announcer" id="album_announcer" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-1 control-label">章节数</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="album_num" id="album_num" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-1 control-label">专辑简介</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="album_content" id="album_content" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <label class="col-sm-1 control-label">图片</label>
+                        <div class="col-sm-5">
+                            <input type="file" name="album_pic" id="album_pic" class="form-control" placeholder="">
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <!--模态页脚-->
+            <div class="modal-footer" id="footer">
+                <button type="button" class="btn btn-primary" onclick="add_album_1()">保存</button>
+                <button class="btn btn-warning" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+

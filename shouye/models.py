@@ -22,10 +22,10 @@ class TAdministrators(models.Model):
 
 class TAlbum(models.Model):
     id = models.BigIntegerField(primary_key=True)
-    url = models.CharField(max_length=500, blank=True, null=True)
+    url = models.ImageField(upload_to="img")
     name = models.CharField(max_length=200, blank=True, null=True)
     score = models.CharField(max_length=200, blank=True, null=True)
-    date = models.DateTimeField(blank=True, null=True)
+    date = models.DateTimeField(blank=True, null=True,default=timezone.now())
     author = models.CharField(max_length=200, blank=True, null=True)
     announcer = models.CharField(max_length=200, blank=True, null=True)
     num = models.CharField(max_length=200, blank=True, null=True)
@@ -51,8 +51,9 @@ class TArticle(models.Model):
 
 
 class TChapter(models.Model):
+    id = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=200, blank=True, null=True)
-    url = models.CharField(max_length=500, blank=True, null=True)
+    url = models.FileField(upload_to='audio')
     size = models.CharField(max_length=200, blank=True, null=True)
     duration = models.CharField(max_length=200, blank=True, null=True)
     t_id = models.BigIntegerField(blank=True, null=True)

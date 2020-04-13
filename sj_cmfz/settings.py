@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'banner',
     'user',
     'article',
+    'album',
 ]
 
 MIDDLEWARE = [
@@ -134,4 +135,6 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'), MEDIA_ROOT)
 
 
 API_KEY = "1b1918b59521f9ec9fcbb102f304d60c"
+
+APPEND_SLASH=False
 
