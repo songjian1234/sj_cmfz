@@ -31,6 +31,7 @@ class CheckPermission(MiddlewareMixin):
             '/shouye/login/',
             '/shouye/get_code/',
             '/shouye/check_user/',
+            '/app/.*',
         ]
 
         # 当前访问的url
