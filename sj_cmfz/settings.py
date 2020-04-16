@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from django.http import request
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -42,6 +44,8 @@ INSTALLED_APPS = [
     'user',
     'article',
     'album',
+    'rbac',
+    'app',
 ]
 
 MIDDLEWARE = [
@@ -52,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'rbac.service.check_permission.CheckPermission',
 ]
 
 ROOT_URLCONF = 'sj_cmfz.urls'
@@ -137,4 +142,6 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'), MEDIA_ROOT)
 API_KEY = "1b1918b59521f9ec9fcbb102f304d60c"
 
 APPEND_SLASH=False
+
+
 
